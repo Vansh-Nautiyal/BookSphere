@@ -28,7 +28,8 @@ public class LoginScreen extends JFrame {
         setSize(960, 620);
         setMinimumSize(new Dimension(860, 560));
         setLocationRelativeTo(null);
-        setResizable(false);
+        setResizable(true);
+        setExtendedState(JFrame.MAXIMIZED_HORIZ);
 
         JPanel root = new JPanel(new GridLayout(1, 2, 0, 0));
         root.add(buildLeft());
@@ -177,7 +178,7 @@ public class LoginScreen extends JFrame {
         regEmail = field("Email address");
         regPhone = field("Phone number");
         regPassword = passField("Choose a password");
-        regRole = new JComboBox<>(new String[] { "student", "member" });
+        regRole = new JComboBox<>(new String[] { "student", "operator" });
         styleCombo(regRole);
 
         JButton btn = bigButton("Create account", GOLD, BG_BLACK);

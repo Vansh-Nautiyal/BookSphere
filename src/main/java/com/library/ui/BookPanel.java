@@ -223,7 +223,7 @@ public class BookPanel extends JPanel {
     // ── Helpers ────────────────────────────────────────────────────────────────
     private boolean canEdit() {
         return currentUser != null &&
-            (currentUser.getRole().equals("member") || currentUser.getRole().equals("admin"));
+            (currentUser.getRole().equals("operator") || currentUser.getRole().equals("admin"));
     }
     private String getText() {
         String t = searchField.getText().trim();

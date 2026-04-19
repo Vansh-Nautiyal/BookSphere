@@ -17,16 +17,16 @@ import static com.library.ThemeColors.*;
 public class HomePage extends JFrame {
 
     private final User currentUser;
-    private JPanel     contentArea;
-    private JPanel     sidebarNav;
-    private String     activeSection = "Dashboard";
-    private JLabel     topBarTitle;
+    private JPanel contentArea;
+    private JPanel sidebarNav;
+    private String activeSection = "Dashboard";
+    private JLabel topBarTitle;
 
     // Cached panels (lazy-loaded)
-    private BookPanel   bookPanel;
-    private MemberPanel memberPanel;
+    private BookPanel bookPanel;
+    private OperatorPanel memberPanel;
     private BorrowPanel borrowPanel;
-    private FinePanel   finePanel;
+    private FinePanel finePanel;
     private ReportPanel reportPanel;
 
     public HomePage(User user) {
@@ -42,12 +42,12 @@ public class HomePage extends JFrame {
         root.setBackground(BG_BLACK);
         setContentPane(root);
 
-        root.add(buildSidebar(),   BorderLayout.WEST);
+        root.add(buildSidebar(), BorderLayout.WEST);
         root.add(buildRightPane(), BorderLayout.CENTER);
     }
 
     // ══════════════════════════════════════════════════════════════════════════
-    //  SIDEBAR
+    // SIDEBAR
     // ══════════════════════════════════════════════════════════════════════════
     private JPanel buildSidebar() {
         JPanel sidebar = new JPanel(new BorderLayout());
@@ -137,7 +137,7 @@ public class HomePage extends JFrame {
         userText.add(uName);
         userText.add(uRole);
 
-        userPanel.add(avatar,   BorderLayout.WEST);
+        userPanel.add(avatar, BorderLayout.WEST);
         userPanel.add(userText, BorderLayout.CENTER);
 
         JButton logoutBtn = new JButton("Logout") {
@@ -151,8 +151,10 @@ public class HomePage extends JFrame {
         };
         logoutBtn.setFont(FONT_SMALL);
         logoutBtn.setForeground(new Color(160, 60, 60));
-        logoutBtn.setOpaque(false); logoutBtn.setContentAreaFilled(false);
-        logoutBtn.setBorderPainted(false); logoutBtn.setFocusPainted(false);
+        logoutBtn.setOpaque(false);
+        logoutBtn.setContentAreaFilled(false);
+        logoutBtn.setBorderPainted(false);
+        logoutBtn.setFocusPainted(false);
         logoutBtn.setBorder(new EmptyBorder(4, 10, 4, 10));
         logoutBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         logoutBtn.addActionListener(e -> {
@@ -162,8 +164,8 @@ public class HomePage extends JFrame {
 
         JPanel bottomArea = new JPanel(new BorderLayout());
         bottomArea.setBackground(new Color(15, 15, 15));
-        bottomArea.add(userPanel,  BorderLayout.CENTER);
-        bottomArea.add(logoutBtn,  BorderLayout.EAST);
+        bottomArea.add(userPanel, BorderLayout.CENTER);
+        bottomArea.add(logoutBtn, BorderLayout.EAST);
 
         JPanel navSection = new JPanel(new BorderLayout());
         navSection.setBackground(BG_DARK);
@@ -176,38 +178,39 @@ public class HomePage extends JFrame {
         sideContent.add(navSection, BorderLayout.CENTER);
 
         sidebar.add(sideContent, BorderLayout.CENTER);
-        sidebar.add(bottomArea,  BorderLayout.SOUTH);
+        sidebar.add(bottomArea, BorderLayout.SOUTH);
         return sidebar;
     }
 
     private void rebuildNav() {
-    sidebarNav.removeAll();
-    String[][] navItems = {
-        {"D", "Dashboard"},
-        {"B", "Books"},
-        {"M", "Members"},
-        {"I", "Borrow / Return"},
-        {"F", "Fines"},
-        {"R", "Reports"},
-    };
+        sidebarNav.removeAll();
+        String[][] navItems = {
+                { "D", "Dashboard" },
+                { "B", "Books" },
+                { "M", "Members" },
+                { "F", "Fines" },
+                { "R", "Reports" },
+        };
+        if (!currentUser.getRole().equals("operator")) {
+            buildNavItem("I", "Borrow / Return");
+        }
 
-    for (String[] item : navItems) {
+        for (String[] item : navItems) {
 
-        // Hide Reports from non-admins
-        if (item[1].equals("Reports") && !currentUser.getRole().equals("admin"))
-            continue;
+            // Hide Reports from non-admins
+            if (item[1].equals("Reports") && !currentUser.getRole().equals("admin"))
+                continue;
 
-        // Hide Members for students
-        if (item[1].equals("Members") && currentUser.getRole().equals("student"))
-            continue;
+            // Hide Members for students
+            if (item[1].equals("Members") && currentUser.getRole().equals("student"))
+                continue;
 
-        sidebarNav.add(buildNavItem(item[0], item[1]));
+            sidebarNav.add(buildNavItem(item[0], item[1]));
+        }
+
+        sidebarNav.revalidate();
+        sidebarNav.repaint();
     }
-
-    sidebarNav.revalidate();
-    sidebarNav.repaint();
-}
-
 
     private JPanel buildNavItem(String icon, String label) {
         boolean active = label.equals(activeSection);
@@ -215,9 +218,8 @@ public class HomePage extends JFrame {
         panel.setBackground(active ? new Color(192, 39, 45, 25) : BG_DARK);
         panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 44));
         panel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(0, active ? 3 : 0, 0, 0, active ? RED : BG_DARK),
-            new EmptyBorder(0, active ? 18 : 21, 0, 16)
-        ));
+                BorderFactory.createMatteBorder(0, active ? 3 : 0, 0, 0, active ? RED : BG_DARK),
+                new EmptyBorder(0, active ? 18 : 21, 0, 16)));
         panel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
         JLabel iconLbl = new JLabel(icon);
@@ -235,11 +237,19 @@ public class HomePage extends JFrame {
 
         panel.addMouseListener(new MouseAdapter() {
             public void mouseEntered(MouseEvent e) {
-                if (!active) { panel.setBackground(BG_HOVER); textLbl.setForeground(WHITE); }
+                if (!active) {
+                    panel.setBackground(BG_HOVER);
+                    textLbl.setForeground(WHITE);
+                }
             }
+
             public void mouseExited(MouseEvent e) {
-                if (!active) { panel.setBackground(BG_DARK); textLbl.setForeground(MUTED); }
+                if (!active) {
+                    panel.setBackground(BG_DARK);
+                    textLbl.setForeground(MUTED);
+                }
             }
+
             public void mouseClicked(MouseEvent e) {
                 activeSection = label;
                 rebuildNav();
@@ -251,7 +261,7 @@ public class HomePage extends JFrame {
     }
 
     // ══════════════════════════════════════════════════════════════════════════
-    //  RIGHT PANE
+    // RIGHT PANE
     // ══════════════════════════════════════════════════════════════════════════
     private JPanel buildRightPane() {
         JPanel pane = new JPanel(new BorderLayout(0, 0));
@@ -276,9 +286,8 @@ public class HomePage extends JFrame {
         JPanel bar = new JPanel(new BorderLayout());
         bar.setBackground(BG_DARK);
         bar.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(0, 0, 1, 0, BORDER),
-            new EmptyBorder(14, 28, 14, 28)
-        ));
+                BorderFactory.createMatteBorder(0, 0, 1, 0, BORDER),
+                new EmptyBorder(14, 28, 14, 28)));
 
         topBarTitle = new JLabel("Dashboard");
         topBarTitle.setFont(FONT_TITLE);
@@ -294,16 +303,23 @@ public class HomePage extends JFrame {
         search.setCaretColor(WHITE);
         search.setFont(FONT_BODY);
         search.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(BORDER, 1, true),
-            new EmptyBorder(0, 12, 0, 12)
-        ));
+                BorderFactory.createLineBorder(BORDER, 1, true),
+                new EmptyBorder(0, 12, 0, 12)));
         search.addFocusListener(new FocusAdapter() {
             final String ph = "Search books, members…";
+
             public void focusGained(FocusEvent e) {
-                if (search.getText().equals(ph)) { search.setText(""); search.setForeground(WHITE); }
+                if (search.getText().equals(ph)) {
+                    search.setText("");
+                    search.setForeground(WHITE);
+                }
             }
+
             public void focusLost(FocusEvent e) {
-                if (search.getText().isEmpty()) { search.setText(ph); search.setForeground(MUTED); }
+                if (search.getText().isEmpty()) {
+                    search.setText(ph);
+                    search.setForeground(MUTED);
+                }
             }
         });
         search.addActionListener(e -> {
@@ -312,7 +328,8 @@ public class HomePage extends JFrame {
                 activeSection = "Books";
                 rebuildNav();
                 topBarTitle.setText("Books");
-                if (bookPanel == null) bookPanel = new BookPanel(currentUser);
+                if (bookPanel == null)
+                    bookPanel = new BookPanel(currentUser);
                 bookPanel.loadBooks(q);
                 setContent(bookPanel);
             }
@@ -335,56 +352,67 @@ public class HomePage extends JFrame {
         }
 
         bar.add(topBarTitle, BorderLayout.WEST);
-        bar.add(right,       BorderLayout.EAST);
+        bar.add(right, BorderLayout.EAST);
         return bar;
     }
 
     // ══════════════════════════════════════════════════════════════════════════
-    //  SECTION ROUTER
+    // SECTION ROUTER
     // ══════════════════════════════════════════════════════════════════════════
     private void showSection(String section) {
-    switch (section) {
-        case "Dashboard":
-            showDashboard();
-            break;
+        switch (section) {
+            case "Dashboard":
+                showDashboard();
+                break;
 
-        case "Books":
-            if (bookPanel == null) bookPanel = new BookPanel(currentUser);
-            setContent(bookPanel);
-            break;
+            case "Books":
+                if (bookPanel == null)
+                    bookPanel = new BookPanel(currentUser);
+                setContent(bookPanel);
+                break;
 
-        case "Members":
-            // Block students completely
-            if (currentUser.getRole().equals("student")) {
-                JOptionPane.showMessageDialog(this, "Access denied.");
-                return;
-            }
+            case "Members":
+                // Block students completely
+                if (currentUser.getRole().equals("student")) {
+                    JOptionPane.showMessageDialog(this, "Access denied.");
+                    return;
+                }
 
-            if (memberPanel == null) memberPanel = new MemberPanel(currentUser);
-            else memberPanel.loadMembers();
-            setContent(memberPanel);
-            break;
+                if (memberPanel == null)
+                    memberPanel = new OperatorPanel(currentUser);
+                else
+                    memberPanel.loadMembers();
+                setContent(memberPanel);
+                break;
 
-        case "Borrow / Return":
-            if (borrowPanel == null) borrowPanel = new BorrowPanel(currentUser);
-            else borrowPanel.loadData();
-            setContent(borrowPanel);
-            break;
+            case "Borrow / Return":
+                if (currentUser.getRole().equals("operator")) {
+                    JOptionPane.showMessageDialog(this,
+                            "Operators are not allowed to issue or return books.",
+                            "Access Denied",
+                            JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                setContent(new BorrowPanel(currentUser));
+                break;
 
-        case "Fines":
-            if (finePanel == null) finePanel = new FinePanel(currentUser);
-            else finePanel.loadFines();
-            setContent(finePanel);
-            break;
+            case "Fines":
+                if (finePanel == null)
+                    finePanel = new FinePanel(currentUser);
+                else
+                    finePanel.loadFines();
+                setContent(finePanel);
+                break;
 
-        case "Reports":
-            if (currentUser.getRole().equals("admin")) {
-                if (reportPanel == null) reportPanel = new ReportPanel(currentUser);
-                setContent(reportPanel);
-            }
-            break;
+            case "Reports":
+                if (currentUser.getRole().equals("admin")) {
+                    if (reportPanel == null)
+                        reportPanel = new ReportPanel(currentUser);
+                    setContent(reportPanel);
+                }
+                break;
+        }
     }
-}
 
     private void setContent(JPanel panel) {
         contentArea.removeAll();
@@ -398,7 +426,7 @@ public class HomePage extends JFrame {
     }
 
     // ══════════════════════════════════════════════════════════════════════════
-    //  DASHBOARD
+    // DASHBOARD
     // ══════════════════════════════════════════════════════════════════════════
     private void showDashboard() {
         JPanel dash = new JPanel();
@@ -414,7 +442,8 @@ public class HomePage extends JFrame {
                 g2.setColor(RED_DARK);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 14, 14);
                 g2.setColor(new Color(255, 255, 255, 5));
-                for (int i = -getHeight(); i < getWidth(); i += 36) g2.drawLine(i, 0, i + getHeight(), getHeight());
+                for (int i = -getHeight(); i < getWidth(); i += 36)
+                    g2.drawLine(i, 0, i + getHeight(), getHeight());
             }
         };
         banner.setOpaque(false);
@@ -428,7 +457,7 @@ public class HomePage extends JFrame {
         wTitle.setFont(new Font("Georgia", Font.BOLD, 20));
         wTitle.setForeground(WHITE);
         JLabel wSub = new JLabel(java.time.LocalDate.now().toString() + "  ·  " +
-            capitalize(currentUser.getRole()) + " account");
+                capitalize(currentUser.getRole()) + " account");
         wSub.setFont(FONT_BODY);
         wSub.setForeground(new Color(220, 180, 180));
         bannerText.add(wTitle);
@@ -437,53 +466,61 @@ public class HomePage extends JFrame {
 
         JPanel bannerRight = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         bannerRight.setOpaque(false);
-        JButton issueBtn = filledButton("+ Issue Book", GOLD, BG_BLACK);
-        issueBtn.addActionListener(e -> {
-            activeSection = "Borrow / Return";
-            rebuildNav(); topBarTitle.setText("Borrow / Return");
-            showSection("Borrow / Return");
-        });
-        bannerRight.add(issueBtn);
-        banner.add(bannerText,  BorderLayout.WEST);
+        if (!currentUser.getRole().equals("operator")) {
+            JButton issueBtn = new JButton("+ Issue Book");
+            bannerRight.add(issueBtn);
+            issueBtn.addActionListener(e -> {
+                activeSection = "Borrow / Return";
+                rebuildNav();
+                topBarTitle.setText("Borrow / Return");
+                showSection("Borrow / Return");
+            });
+        }
+        banner.add(bannerText, BorderLayout.WEST);
         banner.add(bannerRight, BorderLayout.EAST);
 
         // Live stats from DB
         int totalBooks = BookDAO.getTotalCount();
-        int issued     = BookDAO.getIssuedCount();
-        int overdue    = BookDAO.getOverdueCount();
+        int issued = BookDAO.getIssuedCount();
+        int overdue = BookDAO.getOverdueCount();
         double fineAmt = FineDAO.getTotalPendingAmount();
         boolean canViewMembers = isMemberOrAdmin();
 
         JPanel stats = new JPanel(new GridLayout(1, canViewMembers ? 4 : 3, 14, 0));
         stats.setBackground(BG_BLACK);
         stats.setMaximumSize(new Dimension(Integer.MAX_VALUE, 115));
-        stats.add(statCard("Total Books", String.valueOf(totalBooks), "All titles in catalog", GOLD, "View catalog", "Books"));
+        stats.add(statCard("Total Books", String.valueOf(totalBooks), "All titles in catalog", GOLD, "View catalog",
+                "Books"));
         if (canViewMembers) {
             int totalMembers = UserDAO.getTotalCount();
-            stats.add(statCard("Members", String.valueOf(totalMembers), "Registered users", WHITE, "View members", "Members"));
+            stats.add(statCard("Members", String.valueOf(totalMembers), "Registered users", WHITE, "View members",
+                    "Members"));
         }
-        stats.add(statCard("Currently Issued", String.valueOf(issued), "Books checked out", GOLD, overdue + " overdue", "Borrow / Return"));
-        stats.add(statCard("Fine Dues", "Rs " + (int) fineAmt, "Total pending", RED, overdue + " past deadline", "Fines"));
+        stats.add(statCard("Currently Issued", String.valueOf(issued), "Books checked out", GOLD, overdue + " overdue",
+                "Borrow / Return"));
+        stats.add(statCard("Fine Dues", "Rs " + (int) fineAmt, "Total pending", RED, overdue + " past deadline",
+                "Fines"));
 
         // Quick actions
         JPanel alLabel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         alLabel.setBackground(BG_BLACK);
         alLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 32));
         JLabel ql = new JLabel("Quick Actions");
-        ql.setFont(FONT_HEAD); ql.setForeground(GOLD);
+        ql.setFont(FONT_HEAD);
+        ql.setForeground(GOLD);
         alLabel.add(ql);
 
         JPanel actions = new JPanel(new GridLayout(1, currentUser.getRole().equals("admin") ? 4 : 2, 14, 0));
         actions.setBackground(BG_BLACK);
         actions.setMaximumSize(new Dimension(Integer.MAX_VALUE, 80));
 
-        actions.add(actionCard("Issue Book",     "Check out a book",              RED,  "Borrow / Return"));
-        actions.add(actionCard("Return Book",    "Process a return",              GOLD, "Borrow / Return"));
+        actions.add(actionCard("Issue Book", "Check out a book", RED, "Borrow / Return"));
+        actions.add(actionCard("Return Book", "Process a return", GOLD, "Borrow / Return"));
         if (isMemberOrAdmin()) {
-            actions.add(actionCard("Add Book",   "Add title to catalog",          RED,  "Books"));
+            actions.add(actionCard("Add Book", "Add title to catalog", RED, "Books"));
         }
         if (currentUser.getRole().equals("admin")) {
-            actions.add(actionCard("Monthly Report", "Generate admin report",     GOLD, "Reports"));
+            actions.add(actionCard("Monthly Report", "Generate admin report", GOLD, "Reports"));
         }
 
         dash.add(banner);
@@ -505,7 +542,8 @@ public class HomePage extends JFrame {
     }
 
     // ── Stat card ──────────────────────────────────────────────────────────────
-    private JPanel statCard(String label, String value, String sub, Color valColor, String footer, String targetSection) {
+    private JPanel statCard(String label, String value, String sub, Color valColor, String footer,
+            String targetSection) {
         JPanel card = new JPanel() {
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -521,25 +559,44 @@ public class HomePage extends JFrame {
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.setBorder(new EmptyBorder(16, 18, 14, 18));
 
-        JLabel lbl  = new JLabel(label);  lbl.setFont(FONT_SMALL); lbl.setForeground(MUTED);
-        JLabel val  = new JLabel(value);  val.setFont(FONT_NUM);   val.setForeground(valColor);
-        JLabel subL = new JLabel(sub);    subL.setFont(FONT_SMALL); subL.setForeground(MUTED);
+        JLabel lbl = new JLabel(label);
+        lbl.setFont(FONT_SMALL);
+        lbl.setForeground(MUTED);
+        JLabel val = new JLabel(value);
+        val.setFont(FONT_NUM);
+        val.setForeground(valColor);
+        JLabel subL = new JLabel(sub);
+        subL.setFont(FONT_SMALL);
+        subL.setForeground(MUTED);
         JSeparator s = new JSeparator();
         s.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
-        s.setForeground(BORDER); s.setBackground(BORDER);
-        JLabel foot = new JLabel(footer); foot.setFont(FONT_SMALL);
+        s.setForeground(BORDER);
+        s.setBackground(BORDER);
+        JLabel foot = new JLabel(footer);
+        foot.setFont(FONT_SMALL);
         foot.setForeground(valColor.equals(RED) ? RED : GOLD_LIGHT);
         foot.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         foot.addMouseListener(new MouseAdapter() {
-            public void mouseEntered(MouseEvent e) { foot.setText("<html><u>" + footer + "</u></html>"); }
-            public void mouseExited(MouseEvent e)  { foot.setText(footer); }
-            public void mouseClicked(MouseEvent e) { navigateToSection(targetSection); }
+            public void mouseEntered(MouseEvent e) {
+                foot.setText("<html><u>" + footer + "</u></html>");
+            }
+
+            public void mouseExited(MouseEvent e) {
+                foot.setText(footer);
+            }
+
+            public void mouseClicked(MouseEvent e) {
+                navigateToSection(targetSection);
+            }
         });
 
-        card.add(lbl); card.add(Box.createVerticalStrut(6));
-        card.add(val); card.add(subL);
+        card.add(lbl);
+        card.add(Box.createVerticalStrut(6));
+        card.add(val);
+        card.add(subL);
         card.add(Box.createVerticalStrut(10));
-        card.add(s);   card.add(Box.createVerticalStrut(8));
+        card.add(s);
+        card.add(Box.createVerticalStrut(8));
         card.add(foot);
         return card;
     }
@@ -562,9 +619,15 @@ public class HomePage extends JFrame {
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.setBorder(new EmptyBorder(16, 18, 16, 18));
         card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        JLabel t = new JLabel(title); t.setFont(FONT_BOLD); t.setForeground(accent);
-        JLabel s = new JLabel(sub);   s.setFont(FONT_SMALL); s.setForeground(MUTED);
-        card.add(t); card.add(Box.createVerticalStrut(5)); card.add(s);
+        JLabel t = new JLabel(title);
+        t.setFont(FONT_BOLD);
+        t.setForeground(accent);
+        JLabel s = new JLabel(sub);
+        s.setFont(FONT_SMALL);
+        s.setForeground(MUTED);
+        card.add(t);
+        card.add(Box.createVerticalStrut(5));
+        card.add(s);
         card.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 activeSection = targetSection;
@@ -572,28 +635,39 @@ public class HomePage extends JFrame {
                 topBarTitle.setText(targetSection);
                 showSection(targetSection);
             }
-            public void mouseEntered(MouseEvent e) { card.setBackground(BG_HOVER); card.repaint(); }
-            public void mouseExited(MouseEvent e)  { card.setBackground(BG_CARD);  card.repaint(); }
+
+            public void mouseEntered(MouseEvent e) {
+                card.setBackground(BG_HOVER);
+                card.repaint();
+            }
+
+            public void mouseExited(MouseEvent e) {
+                card.setBackground(BG_CARD);
+                card.repaint();
+            }
         });
         return card;
     }
 
     // ══════════════════════════════════════════════════════════════════════════
-    //  HELPERS
+    // HELPERS
     // ══════════════════════════════════════════════════════════════════════════
     private boolean isMemberOrAdmin() {
-        return currentUser.getRole().equals("member") || currentUser.getRole().equals("admin");
+        return currentUser.getRole().equals("operator") || currentUser.getRole().equals("admin");
     }
 
     private String getInitials(String name) {
-        if (name == null || name.isEmpty()) return "?";
+        if (name == null || name.isEmpty())
+            return "?";
         String[] parts = name.trim().split("\\s+");
-        if (parts.length == 1) return parts[0].substring(0, Math.min(2, parts[0].length())).toUpperCase();
+        if (parts.length == 1)
+            return parts[0].substring(0, Math.min(2, parts[0].length())).toUpperCase();
         return (parts[0].charAt(0) + "" + parts[parts.length - 1].charAt(0)).toUpperCase();
     }
 
     private String capitalize(String s) {
-        if (s == null || s.isEmpty()) return s;
+        if (s == null || s.isEmpty())
+            return s;
         return Character.toUpperCase(s.charAt(0)) + s.substring(1);
     }
 
@@ -608,15 +682,19 @@ public class HomePage extends JFrame {
             }
         };
         btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btn.setForeground(fg); btn.setOpaque(false); btn.setContentAreaFilled(false);
-        btn.setBorderPainted(false); btn.setFocusPainted(false);
+        btn.setForeground(fg);
+        btn.setOpaque(false);
+        btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btn.setBorder(new EmptyBorder(8, 18, 8, 18));
         return btn;
     }
 
     private void navigateToSection(String section) {
-        if (section == null || section.isEmpty()) return;
+        if (section == null || section.isEmpty())
+            return;
         activeSection = section;
         rebuildNav();
         topBarTitle.setText(section);
@@ -626,9 +704,10 @@ public class HomePage extends JFrame {
     // ── Legacy no-arg constructor for testing without login ────────────────────
     private void resetDatabase() {
         int confirm = JOptionPane.showConfirmDialog(this,
-            "This will delete all books, borrowings, fines, reports, and all non-admin users.\nContinue?",
-            "Reset Database", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-        if (confirm != JOptionPane.YES_OPTION) return;
+                "This will delete all books, borrowings, fines, reports, and all non-admin users.\nContinue?",
+                "Reset Database", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        if (confirm != JOptionPane.YES_OPTION)
+            return;
 
         if (DatabaseManager.resetDatabase()) {
             bookPanel = null;
@@ -641,12 +720,12 @@ public class HomePage extends JFrame {
             topBarTitle.setText("Dashboard");
             showSection("Dashboard");
             JOptionPane.showMessageDialog(this,
-                "Database reset complete. Admin account was preserved.",
-                "Reset Complete", JOptionPane.INFORMATION_MESSAGE);
+                    "Database reset complete. Admin account was preserved.",
+                    "Reset Complete", JOptionPane.INFORMATION_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(this,
-                "Database reset failed.",
-                "Reset Failed", JOptionPane.ERROR_MESSAGE);
+                    "Database reset failed.",
+                    "Reset Failed", JOptionPane.ERROR_MESSAGE);
         }
     }
 

@@ -6,7 +6,7 @@ public class User {
     private String name;
     private String email;
     private String phone;
-    private String role;       // "student", "member", "admin"
+    private String role;       // "student", "operator", "admin"
     private String password;
     private String joinedDate;
     private String status;     // "active", "suspended"

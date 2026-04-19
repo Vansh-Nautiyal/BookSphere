@@ -59,7 +59,7 @@ public class UserDAO {
         List<User> list = new ArrayList<>();
         try (Statement s = DatabaseManager.getConnection().createStatement();
              ResultSet rs = s.executeQuery(
-                 "SELECT * FROM users WHERE role IN ('student','member') ORDER BY name")) {
+                 "SELECT * FROM users WHERE role IN ('student','operator') ORDER BY name")) {
             while (rs.next()) {
                 User user = map(rs);
                 if (isValidMemberRecord(user) && "active".equalsIgnoreCase(user.getStatus())) {
@@ -213,7 +213,7 @@ public class UserDAO {
         String status = normalize(user.getStatus());
 
         if (globalId.isEmpty() || name.isEmpty()) return false;
-        if (!role.equals("student") && !role.equals("member")) return false;
+        if (!role.equals("student") && !role.equals("operator")) return false;
         if (!status.isEmpty() && !status.equals("active")) return false;
         if (looksLikePlaceholder(globalId) || looksLikePlaceholder(name)) return false;
         return !globalId.equals(name);
