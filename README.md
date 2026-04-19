@@ -101,7 +101,18 @@ Includes:
 
 ## Screenshots
 
-*Add screenshots of your UI here (recommended for GitHub)*
+### Login
+![Login] (screenshots/LoginPage.png)
+
+### Dashboard
+![Dashboard](screenshots/StudentDashboard.png)
+![Admin Dashboard](screenshots/AdminDashboard.png)
+
+### Book Borrowing Page
+![Book Issue](screenshots/BookIssue.png)
+
+### Report
+![Report] (screenshots/Report.png)
 
 ---
 
