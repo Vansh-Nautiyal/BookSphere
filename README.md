@@ -106,13 +106,12 @@ Includes:
 
 ### Dashboard
 ![Dashboard](screenshots/StudentDashboard.png)
-![Admin Dashboard](screenshots/AdminDashboard.png)
 
 ### Book Borrowing Page
 ![Book Issue](screenshots/BookIssue.png)
 
 ### Report
-![Report] (screenshots/Report.png)
+![Report](screenshots/Report.png)
 
 ---
 
