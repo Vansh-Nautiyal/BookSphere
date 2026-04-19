@@ -510,15 +510,27 @@ public class HomePage extends JFrame {
         ql.setForeground(GOLD);
         alLabel.add(ql);
 
-        JPanel actions = new JPanel(new GridLayout(1, currentUser.getRole().equals("admin") ? 4 : 2, 14, 0));
+        boolean isOperator = currentUser.getRole().equals("operator");
+
+        // Dynamic column count
+        int cols = isOperator ? 1 : (currentUser.getRole().equals("admin") ? 4 : 3);
+
+        JPanel actions = new JPanel(new GridLayout(1, cols, 14, 0));
         actions.setBackground(BG_BLACK);
         actions.setMaximumSize(new Dimension(Integer.MAX_VALUE, 80));
 
-        actions.add(actionCard("Issue Book", "Check out a book", RED, "Borrow / Return"));
-        actions.add(actionCard("Return Book", "Process a return", GOLD, "Borrow / Return"));
+        // Only admin/non-operator can issue/return
+        if (!isOperator) {
+            actions.add(actionCard("Issue Book", "Check out a book", RED, "Borrow / Return"));
+            actions.add(actionCard("Return Book", "Process a return", GOLD, "Borrow / Return"));
+        }
+
+        // Operator + Admin can add books
         if (isMemberOrAdmin()) {
             actions.add(actionCard("Add Book", "Add title to catalog", RED, "Books"));
         }
+
+        // Only admin
         if (currentUser.getRole().equals("admin")) {
             actions.add(actionCard("Monthly Report", "Generate admin report", GOLD, "Reports"));
         }

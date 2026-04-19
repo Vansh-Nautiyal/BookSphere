@@ -105,12 +105,6 @@ Includes:
 
 ---
 
-## Author
-
-**Vansh Nautiyal**
-GitHub: https://github.com/Vansh-Nautiyal
-
----
 
 ## License
 
