@@ -102,7 +102,7 @@ Includes:
 ## Screenshots
 
 ### Login
-![Login] (screenshots/LoginPage.png)
+![Login](screenshots/LoginPage.png)
 
 ### Dashboard
 ![Dashboard](screenshots/StudentDashboard.png)
